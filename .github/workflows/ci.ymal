@@ -1,0 +1,54 @@
+name: Vue CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    # 检出代码
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # 设置 Node.js 版本
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16 # 确保与项目的 Node.js 版本兼容
+        cache: 'npm'
+
+    # 切换到项目文件夹
+    - name: Navigate to project directory
+      working-directory: ./vuehr
+      run: echo "Working directory switched to ./vuehr"
+
+    # 安装依赖
+    - name: Install dependencies
+      working-directory: ./vuehr
+      run: npm install
+
+    # 构建项目
+    - name: Build project
+      working-directory: ./vuehr
+      run: npm run build
+
+    # 运行测试（如果有）
+    - name: Run tests
+      working-directory: ./vuehr
+      run: npm test
+
+    # 上传构建结果（可选，静态文件示例）
+    - name: Upload build artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: ./vuehr/dist/ # 指向你的打包文件夹
